@@ -1,4 +1,5 @@
 from .positions import Position
+from .utils import *
 
 class Portfolio:
     def __init__(self):
@@ -10,10 +11,10 @@ class Portfolio:
         """Aggiunge una posizione al portafoglio."""
         self.positions.append(position)
 
-    def remove_position(self, position: Position):
-        """Rimuove una posizione dal portafoglio."""
-        if position in self.positions:
-            self.positions.remove(position)
+    # def remove_position(self, position: Position):
+    #     """Rimuove una posizione dal portafoglio."""
+    #     if position in self.positions:
+    #         self.positions.remove(position)
 
     def calculate_total_value(self, market_data: dict) -> float:
         """Calcola il valore totale del portafoglio sommando il valore di tutte le posizioni."""
@@ -38,12 +39,15 @@ class Portfolio:
         for position in self.positions:
             open_pnl = position.calculate_pnl(market_data)
             summary.append({
+                "ref_date": market_data['ref_date'],
                 "trade_date": position.trade_date,
+                "trade_id": position.trade_id,
                 "symbol": position.symbol,
                 "type": position.asset_type.value,
                 "side": position.position_type.value,
                 "quantity": position.quantity,
                 "entry_price": position.entry_price,
+                "is_alive": position.is_open,
                 "current_value": position.calculate_value(market_data),
                 "open_pnl": open_pnl,
                 "closed_pnl": position.closed_pnl,
@@ -51,10 +55,21 @@ class Portfolio:
             })
         return summary
     
-    def update_portfolio(self, market_data):
-        # controlla se c'è un expiry o esercizio o un evento che genera pnl (es coupon)
-        pass
+    def get_positions(self, symbol: str, position_type: AssetType) -> list:
+        """
+        Restituisce tutte le posizioni associate a un determinato simbolo e tipo di posizione.
 
-    def close_all_positions(self):
-        """Chiude tutte le posizioni rimuovendole dal portafoglio."""
-        self.positions.clear()
+        :param positions: Lista di oggetti Position.
+        :param symbol: Simbolo dell'asset da cercare.
+        :param position_type: Tipo di posizione (LONG o SHORT).
+        :return: Lista di posizioni con il simbolo e il tipo specificato.
+        """
+        filtered_positions = []
+        for position in self.positions:
+            if position.symbol == symbol and position.asset_type == position_type:
+                filtered_positions.append(position)
+        return filtered_positions
+        
+    # def close_all_positions(self):
+    #     """Chiude tutte le posizioni rimuovendole dal portafoglio."""
+    #     self.positions.clear()

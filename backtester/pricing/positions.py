@@ -2,9 +2,23 @@ from abc import ABC, abstractmethod
 from datetime import date 
 import QuantLib as ql
 from .utils import *
+import random
 
+class TradeId:
+    _existing_ids = set()
+
+    @classmethod
+    def generate(cls) -> int:
+        """Genera un numero intero univoco di 5 cifre per identificare una posizione."""
+        while True:
+            trade_id = random.randint(10000, 99999)  # Genera un numero di 5 cifre
+            if trade_id not in cls._existing_ids:
+                cls._existing_ids.add(trade_id)
+                return trade_id
+            
 class Position(ABC):
     def __init__(self, symbol: str, asset_type: AssetType, quantity: float, market_data: dict, position_type: PositionType):
+        self.trade_id = TradeId.generate()
         self.is_open = True
         self.closed_pnl = 0
         self.symbol = symbol
@@ -13,7 +27,6 @@ class Position(ABC):
         self.trade_date = market_data['ref_date']
         self.entry_price = self.calculate_value(market_data) 
         self.position_type = position_type
-        self.event_dates = {}
 
     @abstractmethod
     def calculate_value(self, market_data: dict) -> float:
@@ -53,15 +66,25 @@ class OptionPosition(Position):
         self.day_count = day_count
         self.calendar = calendar
         self.option = self._build_option()
-        self.event_dates['expiry'] = expiry_date
         super().__init__(symbol, AssetType.OPTION, quantity, market_data, position_type)
 
 
     def calculate_value(self, market_data: dict):
         if self.is_expiry_date(market_data['ref_date']):
-            return self._payoff(market_data)
+            if self.is_open:
+                payoff = self._payoff(market_data)
+                self.closed_pnl = (payoff - self.entry_price) * self.quantity * self.position_type.value
+                self.quantity = 0 
+                self.is_open = False
+            return 0
         
         if market_data['ref_date'] > self.expiry_date:
+            # se per qualche motivo è stata saltata l'expiry date senza chiudere/esercitare la posizione, approssima con la data successiva
+            if self.is_open:
+                payoff = self._payoff(market_data)
+                self.closed_pnl = (payoff - self.entry_price) * self.quantity * self.position_type.value
+                self.quantity = 0 
+                self.is_open = False
             return 0
         
         valuation_date = ql.Date.from_date(market_data['ref_date'])

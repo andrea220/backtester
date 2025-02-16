@@ -17,7 +17,7 @@ class MarketData:
         Generate a market data dictionary from a given prices DataFrame.
         The market data contains equity prices and dividend yields.
         """
-        prices_df = pd.read_csv(f'data/prices/{symbol}_prices.csv').iloc[:, 1:]
+        prices_df = pd.read_csv(f'../data/prices/{symbol}_prices.csv').iloc[:, 1:]
         prices_df['date'] = pd.to_datetime(prices_df['date'], format='%d/%m/%y').dt.date
         prices_df = prices_df[(prices_df['date'] >= self.start_date)& (prices_df['date'] <= self.end_date)].copy()
 
@@ -43,7 +43,7 @@ class MarketData:
         return self.market_data
     
     def _fill_vols(self, symbol):
-        vols_df = pd.read_csv(f'data/volatilities/{symbol}_ivol.csv').iloc[:, 1:]
+        vols_df = pd.read_csv(f'../data/volatilities/{symbol}_ivol.csv').iloc[:, 1:]
         vols_df['reference_date'] = pd.to_datetime(vols_df['reference_date']).dt.date
         vols_df = vols_df[(vols_df['reference_date'] >= self.start_date)& (vols_df['reference_date'] <= self.end_date)].copy()
 
