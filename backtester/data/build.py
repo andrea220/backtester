@@ -4,7 +4,8 @@ from pathlib import Path
 # import QuantLib as ql 
 import json
 
-DATA_PATH = "C:/Users/S542279/Desktop/backtester/backtester/data/"
+#DATA_PATH = "C:/Users/S542279/Desktop/backtester/backtester/data/"
+DATA_PATH = "C:/UsersS542282/Documents/GitHub/backtester/backtester/data/"
 
 def get_file_names(path):
     folder_path = Path(path)
