@@ -1,11 +1,11 @@
 import pandas as pd 
 from pathlib import Path
-# from datetime import date
+import datetime
 # import QuantLib as ql 
 import json
 
-#DATA_PATH = "C:/Users/S542279/Desktop/backtester/backtester/data/"
-DATA_PATH = "C:/UsersS542282/Documents/GitHub/backtester/backtester/data/"
+DATA_PATH = "C:/Users/S542279/Desktop/backtester/backtester/data/"
+# DATA_PATH = "C:/UsersS542282/Documents/GitHub/backtester/backtester/data/"
 
 def get_file_names(path):
     folder_path = Path(path)
@@ -76,7 +76,6 @@ class MarketData:
                     }
 
                 vols_df_tmp = vols_df.loc[current_date].copy()
-                # vols_df_tmp.fillna("nan", inplace=True)
                 vols_df_tmp["tenor"] = vols_df_tmp["tenor"].str.replace("D", "").astype(int)
 
                 moneyness = vols_df_tmp['moneyness'].tolist()
@@ -108,10 +107,17 @@ class MarketData:
             self.build()
             print("Done!")
             print("*****")
-            return 
         
+        # with open(self.data_path + "MarketData.json", "r", encoding="utf-8") as file:
+        #     self.market_data = json.load(file)
+
         with open(self.data_path + "MarketData.json", "r", encoding="utf-8") as file:
             self.market_data = json.load(file)
+
+        # Convertire 'ref_date' in datetime.date
+        for date_key, data in self.market_data.items():
+            if "ref_date" in data:
+                data["ref_date"] = datetime.datetime.strptime(data["ref_date"], "%Y-%m-%d").date()
 
         
     

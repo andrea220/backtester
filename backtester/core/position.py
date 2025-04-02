@@ -3,6 +3,7 @@ from datetime import date
 import QuantLib as ql
 from .utils import *
 import random
+from scipy.interpolate import RegularGridInterpolator
 
 class TradeId:
     _existing_ids = set()
@@ -101,25 +102,22 @@ class OptionPosition(Position):
                 self.quantity = 0 
                 self.is_open = False
             return 0
+        spot_ref = market_data['equity'][self.symbol]['close']
         
         valuation_date = ql.Date.from_date(market_data['ref_date'])
         ql.Settings.instance().evaluationDate = valuation_date
         maturity_date = ql.Date.from_date(self.expiry_date)
+        dtm = maturity_date - valuation_date
 
-        # sigma = market_data['volatility'][self.symbol].blackVol(maturity_date, self.strike_price)
-        ## da cambiare
-        surface = market_data['volatility'][self.symbol]
+        tenor = market_data['volatility'][self.symbol]['tenor']
+        moneyness = market_data['volatility'][self.symbol]['moneyness']
+        vol = market_data['volatility'][self.symbol]['volatility']
+        interp_surface = RegularGridInterpolator((moneyness, tenor), vol, bounds_error=False, fill_value=None)
 
-        if self.strike_price >= surface.maxStrike():
-            sigma = surface.blackVol(maturity_date, surface.maxStrike())
-        elif self.strike_price <= surface.minStrike():
-            sigma = surface.blackVol(maturity_date, surface.minStrike())
-        else:
-            sigma = surface.blackVol(maturity_date, self.strike_price)
+        sigma = float(interp_surface((self.strike_price/spot_ref, dtm)))
 
-        # self.initial_spot = market_data['equity'][self.symbol]['price']
         spot_handle = ql.QuoteHandle(
-        ql.SimpleQuote(market_data['equity'][self.symbol]['price'])
+        ql.SimpleQuote(spot_ref)
         )
         flat_ts = ql.YieldTermStructureHandle(
         ql.FlatForward(valuation_date, market_data['rate']['riskfree'], self.day_count)
@@ -139,7 +137,7 @@ class OptionPosition(Position):
         return self.option.NPV()
     
     def _payoff(self, market_data: dict):
-        return max((market_data['equity'][self.symbol]['price'] - self.strike_price) * self.option_type, 0) 
+        return max((market_data['equity'][self.symbol]['close'] - self.strike_price) * self.option_type, 0) 
 
     def _build_option(self):
         maturity_date = ql.Date.from_date(self.expiry_date)
