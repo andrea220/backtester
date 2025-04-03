@@ -29,7 +29,6 @@ class Position(ABC):
         self.entry_price = self.calculate_value(market_data) 
         self.initial_ctv = (self.entry_price * self.quantity)
         self.position_type = position_type
-        # self.initial_spot = None
 
     @abstractmethod
     def calculate_value(self, market_data: dict) -> float:
@@ -37,16 +36,10 @@ class Position(ABC):
         pass
 
     def calculate_pnl(self, market_data: dict) -> float:
-        try:
-            if self.is_open:
-                return (self.calculate_value(market_data) - self.entry_price) * self.position_type.value * self.quantity 
-            else:
-                return 0
-        except Exception as e:
-            print(f"position in error: {self.trade_id}")
-            print(f"POSITION TRADE_DATE {self.trade_date}")
-            print(f"POSITION ENTRY PRICE {self.entry_price}")
-
+        if self.is_open:
+            return (self.calculate_value(market_data) - self.entry_price) * self.position_type.value * self.quantity 
+        else:
+            return 0
     
     def close_position(self, market_data: dict):
         self.closed_pnl = self.calculate_pnl(market_data)

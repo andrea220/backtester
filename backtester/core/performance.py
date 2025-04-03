@@ -42,14 +42,18 @@ class ResultAnalyzer:
 
         return drawdown.min()  # Il valore minimo è il drawdown massimo
 
-    def plot_pnl(self):
+    def plot_pnl(self, benchmark=None):
         """
         Plotta il P&L totale del portafoglio nel tempo.
         """
         daily_pnl = self.compute_aggregated_pnl()
-        dates = [datetime.strptime(d, '%Y-%m-%d').date() for d in daily_pnl['ref_date']]
+        dates = [d for d in daily_pnl['ref_date']]
         plt.figure(figsize=(12, 6))
         plt.plot(dates, daily_pnl['daily_pnl'], label="Global P&L", color="blue")
+        if benchmark is not None:
+            daily_pnl2 = benchmark.compute_aggregated_pnl()
+            dates2 = [d for d in daily_pnl2['ref_date']]
+            plt.plot(dates2, daily_pnl2['daily_pnl'], label="Benchmark P&L", color="green")
         plt.axhline(self.period_pnl.iloc[0,1], color='black', linestyle='--', linewidth=1)
         plt.xlabel("Date")
         plt.ylabel("Total P&L")
