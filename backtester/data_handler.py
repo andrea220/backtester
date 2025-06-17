@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import mplfinance as mpf
 import matplotlib.dates as mdates
 from matplotlib.patches import Rectangle
+import json
 
 class MarketDataHandler:
     
@@ -15,6 +16,7 @@ class MarketDataHandler:
         self.prices_path = DATA_PATH + "prices"
         self.vols_path = DATA_PATH + "volatilities"
         self.data_path = DATA_PATH
+        self.market_data = {}
 
     @staticmethod
     def _bbg_intraday_dump(ticker: str,
@@ -213,9 +215,7 @@ class MarketDataHandler:
         self.update_series(ticker, '1d')
         if intraday:
             self.update_series(ticker, '1m') 
-
-
-        
+     
     def _prepare_df(self, ticker: str, start_date: str, end_date: str, freq: str) -> pd.DataFrame:
         """Carica, indicizza e filtra il DataFrame."""
         df = self.load_price(ticker, freq)
@@ -374,3 +374,68 @@ class MarketDataHandler:
             self._plot_volume_candles(df_plot, ticker, start_date, end_date)
         else:
             raise ValueError("kind deve essere 'line', 'ohlc' o 'vol'")
+        
+    def load_universe(self, universe, start_date, end_date, frequency, rebuild):
+        df_all = {}
+
+        for ticker in universe:
+            if rebuild:
+                self.build(ticker, start_date, end_date)
+            
+            df_all[ticker] = self.load_price(ticker, frequency)
+        return df_all
+    
+    def _fill_prices(self, universe, start_date, end_date, frequency, rebuild):
+        for tk in universe:
+            if rebuild:
+                self.build(tk, start_date, end_date)
+
+            df_prices = self.load_price(tk, frequency)
+
+            for ix, row in df_prices.iterrows():
+                current_date = row['date'].isoformat()
+
+                if current_date not in self.market_data:
+                    self.market_data[current_date] = {"ref_date": current_date,
+                                                      "EOD": {
+                                                                "ref_date": current_date,
+                                                                "equity": {},
+                                                                "rate": {},  
+                                                                "volatility": {}
+                                                            }}
+                    
+                # Aggiungi i dati dell'equity
+                if frequency == '1d':
+                    self.market_data[current_date]['EOD']["equity"][tk] = {
+                                                                        "open": float(row["open"]),
+                                                                        "high": float(row["high"]),
+                                                                        "low": float(row["low"]),
+                                                                        "close": float(row["close"]),
+                                                                        "volume": float(row["volume"]),
+                                                                        "is_valid": True
+                                                                    }
+                else:
+                    return
+                    
+    def _build_market(self, universe, start_date, end_date, frequency, rebuild):
+        self._fill_prices(universe, start_date, end_date, frequency, rebuild)
+
+        with open(f"{self.data_path}MarketData.json", "w") as json_file:
+            json.dump(self.market_data, json_file, indent=4)
+
+    def load_market(self, universe, start_date, end_date, frequency='1d', rebuild=False):
+        if rebuild:
+            print("*****")
+            print("Building MarketData...")
+            self._build_market(universe, start_date, end_date, frequency, rebuild)
+            print("Done!")
+            print("*****")
+        
+
+        with open(f"{self.data_path}MarketData.json", "r", encoding="utf-8") as file:
+            self.market_data = json.load(file)
+
+        # Convertire 'ref_date' in datetime.date
+        for date_key, data in self.market_data.items():
+            if "ref_date" in data:
+                data["ref_date"] = datetime.strptime(data["ref_date"], "%Y-%m-%d").date()

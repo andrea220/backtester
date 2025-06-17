@@ -32,7 +32,6 @@ def prices_to_df(history, field = 'close'):
     return df 
 
 
-
 class Indicator(ABC):
     def __init__(self):
         self.methods = {}
@@ -58,8 +57,6 @@ class Indicator(ABC):
     def warmup(self, name, prices, window):
         """ Ensure there is enough historical data for the indicator """
         pass
-
-
 
 
 class Backtester(ABC):

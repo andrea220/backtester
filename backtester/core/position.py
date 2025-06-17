@@ -42,9 +42,11 @@ class Position(ABC):
             return 0
     
     def close_position(self, market_data: dict):
-        self.closed_pnl = self.calculate_pnl(market_data)
-        self.quantity = 0 
-        self.is_open = False
+        if self.is_open:
+            self.closed_pnl = self.calculate_pnl(market_data)
+            self.quantity = 0 
+            self.is_open = False
+        return
 
     def calculate_ctv(self, market_data: dict):
         if self.is_open:
