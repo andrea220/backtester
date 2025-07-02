@@ -105,6 +105,7 @@ TBD
 ## Roadmap rilasci
 - Data Structure
     - creazione file parquet prezzi
-    - aggiornamento file parquet
+    - aggiornamento file parquet i file prices/{ticker}/{year}/{day}.parquet, aggrega i dati per giorno e salva un file cache/daily_snapshots/{year}/{month}/{day}.parquet
 - Backtester
+    - creazione script che legge tutti i ticker
     - backtester intraday e daily
