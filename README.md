@@ -6,7 +6,10 @@ Questa documentazione descrive la struttura dei dati utilizzata per una libreria
 ---
 
 ## 📁 Struttura delle directory
-
+data/ 
+    ├── prices/
+    │ ├── AAPL/ 
+    │ │ └── 2025/ │ │ ├── 07-01.parquet │ │ ├── 07-02.parquet │ │ └── ... │ └── MSFT/ │ └── 2025/ │ ├── 07-01.parquet │ └── ... ├── dividends/ │ ├── AAPL.parquet │ └── MSFT.parquet ├── corporate_actions/ │ ├── AAPL.parquet │ └── MSFT.parquet └── metadata/ └── tickers_info.parquet
 
 ## 🧾 Contenuto dei file `prices/{ticker}/{year}/{day}.parquet`
 
