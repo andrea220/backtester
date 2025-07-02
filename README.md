@@ -100,9 +100,11 @@ Contiene informazioni statiche sui titoli.
 ---
 
 ## Backtesting
-- bla bla
+TBD
 
 ## Roadmap rilasci
-- primo test dati
-- algo di prova 
-- ecc
+- Data Structure
+    - creazione file parquet prezzi
+    - aggiornamento file parquet
+- Backtester
+    - backtester intraday e daily
