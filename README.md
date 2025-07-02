@@ -1,11 +1,18 @@
 
-# 📊 Backtesting Data Structure
 
-Questa documentazione descrive la struttura dei dati utilizzata per una libreria di backtesting finanziario ad alte prestazioni. I dati sono salvati in formato **Parquet** e organizzati per **ticker**, **anno**, **mese** e **giorno**, con supporto sia per dati **intraday** (1 minuto) che per dati **End Of Day (EOD)**.
+## Indice
+- [Data Structure](#data-structure)  
+- [Backtesting](#backtesting)  
+- [Roadmap](#roadmap)  
+
+
+## Data Structure
+
+I dati sono salvati in formato **Parquet** e organizzati per **ticker**, **anno**, **mese** e **giorno**, con supporto sia per dati **intraday** (1 minuto) che per dati **End Of Day (EOD)**.
 
 ---
 
-## 📁 Struttura delle directory
+### 📁 Struttura delle directory
 
 La cartella `data/` è organizzata nel modo seguente:
 
@@ -40,11 +47,11 @@ data/
     └── tickers_info.parquet
 ```
 
-## 🧾 Contenuto dei file `prices/{ticker}/{year}/{day}.parquet`
+### 🧾 Contenuto dei file `prices/{ticker}/{year}/{day}.parquet`
 
 Ogni file contiene dati a 1 minuto e un record EOD per la giornata.
 
-### Colonne:
+#### Colonne:
 - `timestamp`: datetime (UTC)
 - `open`: prezzo di apertura
 - `high`: prezzo massimo
@@ -55,11 +62,11 @@ Ogni file contiene dati a 1 minuto e un record EOD per la giornata.
 
 ---
 
-## 📄 File `dividends/{ticker}.parquet`
+### 📄 File `dividends/{ticker}.parquet`
 
 Contiene i dividendi storici per ciascun titolo.
 
-### Colonne:
+#### Colonne:
 - `ex_date`
 - `amount`
 - `currency`
@@ -67,11 +74,11 @@ Contiene i dividendi storici per ciascun titolo.
 
 ---
 
-## 🏢 File `corporate_actions/{ticker}.parquet`
+### 🏢 File `corporate_actions/{ticker}.parquet`
 
 Contiene eventi societari come split, reverse split, spin-off, ecc.
 
-### Colonne:
+#### Colonne:
 - `date`
 - `type`
 - `ratio`
@@ -79,11 +86,11 @@ Contiene eventi societari come split, reverse split, spin-off, ecc.
 
 ---
 
-## 🧠 File `metadata/tickers_info.parquet`
+### 🧠 File `metadata/tickers_info.parquet`
 
 Contiene informazioni statiche sui titoli.
 
-### Colonne:
+#### Colonne:
 - `ticker`
 - `name`
 - `isin`
@@ -92,9 +99,10 @@ Contiene informazioni statiche sui titoli.
 
 ---
 
-## ✅ Vantaggi
+## Backtesting
+- bla bla
 
-- Accesso veloce e selettivo ai dati
-- Struttura scalabile e modulare
-- Supporto per analisi miste intraday/EOD
-- Compatibilità con Polars e Pandas
+## Roadmap rilasci
+- primo test dati
+- algo di prova 
+- ecc
