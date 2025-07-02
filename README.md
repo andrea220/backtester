@@ -38,7 +38,7 @@ data/
 │   └── MSFT.parquet
 └── metadata/
     └── tickers_info.parquet
-
+```
 
 ## 🧾 Contenuto dei file `prices/{ticker}/{year}/{day}.parquet`
 
