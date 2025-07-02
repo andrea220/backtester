@@ -6,17 +6,39 @@ Questa documentazione descrive la struttura dei dati utilizzata per una libreria
 ---
 
 ## 📁 Struttura delle directory
+
+La cartella `data/` è organizzata nel modo seguente:
+
+```text
 data/
-└── prices/
-    └── AAPL/
-        ├── intraday/
-        │   └── 2025/
-        │       └── 07/
-        │           └── 01.parquet
-        └── eod/
-            └── 2025/
-                └── 07/
-                    └── 01.parquet
+├── prices/
+│   ├── AAPL/
+│   │   ├── intraday/
+│   │   │   └── 2025/
+│   │   │       └── 07/
+│   │   │           └── 01.parquet
+│   │   └── eod/
+│   │       └── 2025/
+│   │           └── 07/
+│   │               └── 01.parquet
+│   └── MSFT/
+│       ├── intraday/
+│       │   └── 2025/
+│       │       └── 07/
+│       │           └── 01.parquet
+│       └── eod/
+│           └── 2025/
+│               └── 07/
+│                   └── 01.parquet
+├── dividends/
+│   ├── AAPL.parquet
+│   └── MSFT.parquet
+├── corporate_actions/
+│   ├── AAPL.parquet
+│   └── MSFT.parquet
+└── metadata/
+    └── tickers_info.parquet
+
 
 ## 🧾 Contenuto dei file `prices/{ticker}/{year}/{day}.parquet`
 
