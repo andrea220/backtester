@@ -95,7 +95,7 @@ Contiene informazioni statiche sui titoli.
 ## Backtesting
 TBD
 
-## Roadmap rilasci
+## Roadmap
 - Data Structure
     - creazione ETL da Polygon
 - Backtester
