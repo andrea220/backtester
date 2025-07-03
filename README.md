@@ -20,20 +20,10 @@ La cartella `data/` è organizzata nel modo seguente:
 data/
 ├── prices/
 │   ├── AAPL/
-│   │   ├── intraday/
-│   │   │   └── 2025/
-│   │   │       └── 07/
-│   │   │           └── 01.parquet
-│   │   └── eod/
-│   │       └── 2025/
-│   │           └── 07/
-│   │               └── 01.parquet
+│   │      └── 2025/
+│   │          └── 07/
+│   │              └── 01.parquet
 │   └── MSFT/
-│       ├── intraday/
-│       │   └── 2025/
-│       │       └── 07/
-│       │           └── 01.parquet
-│       └── eod/
 │           └── 2025/
 │               └── 07/
 │                   └── 01.parquet
@@ -52,12 +42,15 @@ data/
 Ogni file contiene dati a 1 minuto e un record EOD per la giornata.
 
 #### Colonne:
-- `timestamp`: datetime (UTC)
+- `date`: data (UTC)
+- `time`: time (UTC+2)
+- `ticker`: ticker del sottostante
 - `open`: prezzo di apertura
 - `high`: prezzo massimo
 - `low`: prezzo minimo
 - `close`: prezzo di chiusura
 - `volume`: volume scambiato
+- `insertion_time`: timestamp di salvataggio
 - `type`: `"intraday"` oppure `"eod"`
 
 ---
@@ -104,8 +97,7 @@ TBD
 
 ## Roadmap rilasci
 - Data Structure
-    - creazione file parquet prezzi
-    - aggiornamento file parquet
+    - creazione ETL da Polygon
 - Backtester
     - creazione script che legge tutti i file prices/{ticker}/{year}/{day}.parquet dell'universo, aggrega i dati per giorno e salva un file cache/daily_snapshots/{year}/{month}/{day}.parquet
     - backtester intraday e daily

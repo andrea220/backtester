@@ -385,38 +385,6 @@ class MarketDataHandler:
             df_all[ticker] = self.load_price(ticker, frequency)
         return df_all
     
-    def _fill_prices_old(self, universe, start_date, end_date, frequency, rebuild):
-        for tk in universe:
-            if rebuild:
-                self.build(tk, start_date, end_date)
-
-            df_prices = self.load_price(tk, frequency)
-
-            for ix, row in df_prices.iterrows():
-                current_date = row['date'].isoformat()
-
-                if current_date not in self.market_data:
-                    self.market_data[current_date] = {"ref_date": current_date,
-                                                      "EOD": {
-                                                                "ref_date": current_date,
-                                                                "equity": {},
-                                                                "rate": {},  
-                                                                "volatility": {}
-                                                            }}
-                    
-                # Aggiungi i dati dell'equity
-                if frequency == '1d':
-                    self.market_data[current_date]['EOD']["equity"][tk] = {
-                                                                        "open": float(row["open"]),
-                                                                        "high": float(row["high"]),
-                                                                        "low": float(row["low"]),
-                                                                        "close": float(row["close"]),
-                                                                        "volume": float(row["volume"]),
-                                                                        "is_valid": True
-                                                                    }
-                else:
-                    return
-                
     def _fill_prices(self, universe, start_date, end_date, frequency, rebuild):
         for tk in universe:
             if rebuild:
