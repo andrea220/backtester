@@ -42,7 +42,7 @@ data/
 Ogni file contiene dati a 1 minuto e un record EOD per la giornata.
 
 #### Colonne:
-- `date`: data (UTC)
+- `date`: data di riferimento
 - `time`: time (UTC+2)
 - `ticker`: ticker del sottostante
 - `open`: prezzo di apertura
