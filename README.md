@@ -14,19 +14,16 @@ I dati sono salvati in formato **Parquet** e organizzati per **ticker**, **anno*
 
 ### 📁 Struttura delle directory
 
-La cartella `data/` è organizzata nel modo seguente:
+La cartella `data/` è organizzata così:
 
 ```text
 data/
 ├── prices/
 │   ├── AAPL/
-│   │      └── 2025/
-│   │          └── 07/
-│   │              └── 01.parquet
+│   │   ├── 2024.parquet
+│   │   └── 2025.parquet
 │   └── MSFT/
-│           └── 2025/
-│               └── 07/
-│                   └── 01.parquet
+│       └── 2025.parquet
 ├── dividends/
 │   ├── AAPL.parquet
 │   └── MSFT.parquet
@@ -37,21 +34,31 @@ data/
     └── tickers_info.parquet
 ```
 
-### 🧾 Contenuto dei file `prices/{ticker}/{year}/{day}.parquet`
+---
 
-Ogni file contiene dati a 1 minuto e un record EOD per la giornata.
+### 🧾 Contenuto dei file `prices/{ticker}/{year}.parquet`
 
-#### Colonne:
-- `date`: data di riferimento
-- `time`: time (UTC+2)
-- `ticker`: ticker del sottostante
-- `open`: prezzo di apertura
-- `high`: prezzo massimo
-- `low`: prezzo minimo
-- `close`: prezzo di chiusura
-- `volume`: volume scambiato
-- `insertion_time`: timestamp di salvataggio
-- `type`: `"intraday"` oppure `"eod"`
+Ogni file **annuale** contiene:
+- barre **intraday a 1 minuto**
+- un record **EOD** per ciascun giorno  
+I due tipi sono distinguibili dalla colonna `type` (`"intraday"` | `"eod"`).
+
+**Colonne**
+- `date` — data di riferimento (tipo data)
+- `time` — orario **Europe/Rome** (gestisce il DST)
+- `ticker` — simbolo del titolo
+- `open`, `high`, `low`, `close` — prezzi
+- `volume` — volume scambiato
+- `insertion_time` — timestamp di salvataggio (timezone del sistema)
+- `type` — `"intraday"` oppure `"eod"`
+
+**Note operative**
+- Dati salvati **per anno** (`{ticker}/{YYYY}.parquet`) con compressione **ZSTD**.
+- In aggiornamento:
+  - i nuovi record vengono **uniti** a quelli esistenti;
+  - in caso di duplicati su `['date','time','type']` si mantiene **l’ultima occorrenza**;
+  - la **giornata dell’ultima data** già presente viene **riscritta** (overwrite) per allineare eventuali correzioni del provider.
+- Gli anni precedenti non vengono modificati (salvo backfill esplicito).
 
 ---
 
@@ -59,7 +66,7 @@ Ogni file contiene dati a 1 minuto e un record EOD per la giornata.
 
 Contiene i dividendi storici per ciascun titolo.
 
-#### Colonne:
+**Colonne**
 - `ex_date`
 - `amount`
 - `currency`
@@ -67,30 +74,16 @@ Contiene i dividendi storici per ciascun titolo.
 
 ---
 
-### 🏢 File `corporate_actions/{ticker}.parquet`
+### 📄 File `corporate_actions/{ticker}.parquet`
 
-Contiene eventi societari come split, reverse split, spin-off, ecc.
+Contiene le azioni societarie (es. split, reverse split, ecc.).
 
-#### Colonne:
-- `date`
-- `type`
-- `ratio`
-- `notes`
+**Colonne (tipiche)**
+- `ca_type` (es. `DIVIDEND`, `SPLIT`, …)
+- `ex_date`, `record_date`, `payment_date`
+- `amount` (per dividendi), `split_ratio` (per split)
+- `currency`
 
----
-
-### 🧠 File `metadata/tickers_info.parquet`
-
-Contiene informazioni statiche sui titoli.
-
-#### Colonne:
-- `ticker`
-- `name`
-- `isin`
-- `sector`
-- `exchange`
-
----
 
 ## Backtesting
 TBD
