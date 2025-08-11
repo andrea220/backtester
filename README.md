@@ -36,7 +36,7 @@ data/
 
 ---
 
-### 🧾 Contenuto dei file `prices/{ticker}/{year}.parquet`
+### 🧾 Prezzi `prices/{ticker}/{year}.parquet`
 
 Ogni file **annuale** contiene:
 - barre **intraday a 1 minuto**
@@ -61,28 +61,37 @@ I due tipi sono distinguibili dalla colonna `type` (`"intraday"` | `"eod"`).
 - Gli anni precedenti non vengono modificati (salvo backfill esplicito).
 
 ---
+### 📄 Dividendi (`data/dividends/{ticker}.parquet`)
 
-### 📄 File `dividends/{ticker}.parquet`
+Questa sezione descrive come vengono salvati e aggiornati i **dividendi** per ciascun titolo.
 
-Contiene i dividendi storici per ciascun titolo.
+**Percorso file**
+```
+data/dividends/{TICKER}.parquet
+```
 
-**Colonne**
-- `ex_date`
-- `amount`
-- `currency`
-- `payment_date`
+**Origine dati**
+- Bloomberg via `xbbg` (funzione `BDS('DVD_HIST_ALL')`).
 
----
+**Schema colonne (tipico)**
+- `ex_date` — data ex-dividend (datetime)
+- `payment_date` — data pagamento (datetime)
+- `amount` — importo dividendo per azione (float)
+- `currency` — valuta (string)
+- `ticker` — simbolo (string)
+- `insertion_time` — timestamp di salvataggio (datetime)
 
-### 📄 File `corporate_actions/{ticker}.parquet`
+**Politiche di scrittura/aggiornamento**
+- Salvataggio **incrementale** in Parquet con compressione **ZSTD**.
+- **Merge** con il file esistente e **deduplica** su chiavi robuste:
+  `['ticker', 'ex_date', 'payment_date', 'amount', 'currency']` (keep='last').
+- Possibile filtro per periodo in input (su `ex_date`) prima del salvataggio.
 
-Contiene le azioni societarie (es. split, reverse split, ecc.).
+**Note**
+- Le colonne disponibili possono variare a seconda del provider/strumento (lo schema è unione dei campi disponibili).
+- Per backtest “as-of” considera di congelare snapshot periodici della cartella `data/dividends/` (es. `revisions/snapshot=YYYY-MM-DD/`).
 
-**Colonne (tipiche)**
-- `ca_type` (es. `DIVIDEND`, `SPLIT`, …)
-- `ex_date`, `record_date`, `payment_date`
-- `amount` (per dividendi), `split_ratio` (per split)
-- `currency`
+
 
 
 ## Backtesting
